@@ -1,0 +1,61 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: kodaulguri-user
+  redis:
+    host: 192.168.219.124
+    port: 6379
+  # Cloud Stream
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: kodaulguriUser
+          content-type: application/json
+      kafka:
+        binder:
+          zkNodes: 192.168.219.124:2181
+          brokers: 192.168.219.124:9092
+
+
+# Service Discovery
+eureka:
+  instance:
+    ip-address: localhost
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://122.43.41.113:8761/eureka
+
+
+# Circuit Breaker
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 100
+      permittedNumberOfCallsInHalfOpenState: 10
+      waitDurationInOpenState: 10000
+      failureRateThreshold: 60
+      eventConsumerBufferSize: 10
+      registerHealthIndicator: true
+    someShared:
+      slidingWindowSize: 50
+      permittedNumberOfCallsInHalfOpenState: 10
+  instances:
+    backendA:
+      baseConfig: default
+      waitDurationInOpenState: 5000
+    backendB:
+      baseConfig: someShared
+
+
+
+
+kodaulguri:
+  payment:
+    url: KODAULGURI-PAYMENT
