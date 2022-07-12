@@ -1,5 +1,6 @@
 package com.tpotato.kodaulguri.user.webapp.component;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -13,14 +14,10 @@ import reactor.core.publisher.Signal;
 import java.util.List;
 import java.util.function.Supplier;
 
+@RequiredArgsConstructor
 @Component
 public class ReactiveCacheManager {
-  private CacheManager cacheManager;
-
-  @Autowired
-  public ReactiveCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
+  private final CacheManager cacheManager;
 
   public <T> Mono<T> findCachedMono(String cacheName, Object key, Supplier<Mono<T>> retriever, Class<T> classType) {
     Cache cache = cacheManager.getCache(cacheName);
@@ -35,6 +32,11 @@ public class ReactiveCacheManager {
             cache.put(k, signal.get());
           }
         }));
+  }
+
+  public <T> void updateCache(String cacheName, Object key, T value) {
+    Cache cache = cacheManager.getCache(cacheName);
+    cache.put(key, value);
   }
 
   public <T> Flux<T> findCachedFlux(String cacheName, Object key, Supplier<Flux<T>> retriever) {

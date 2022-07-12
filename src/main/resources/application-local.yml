@@ -11,6 +11,10 @@ spring:
   cloud:
     stream:
       bindings:
+        input:
+          destination: kodaulguriPayment
+          content-type: application/json
+          group: userGroup
         output:
           destination: kodaulguriUser
           content-type: application/json
